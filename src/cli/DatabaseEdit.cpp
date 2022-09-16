@@ -107,6 +107,38 @@ QSharedPointer<CompositeKey> DatabaseEdit::getNewDatabaseKey(QSharedPointer<Data
     auto& err = Utils::STDERR;
     auto newDatabaseKey = QSharedPointer<CompositeKey>::create();
 
+    if (removePassword) {
+        if (!database->key()->hasKey(PasswordKey::UUID)) {
+            err << QObject::tr("Cannot remove password: The database does not have a password.") << endl;
+            return {};
+        }
+    }
+    if (removeKeyFile) {
+        if (!database->key()->hasKey(FileKey::UUID)) {
+            err << QObject::tr("Cannot remove file key: The database does not have a file key.") << endl;
+            return {};
+        }
+    }
+
+    QSharedPointer<PasswordKey> newPasswordKey;
+    if (updatePassword) {
+        newPasswordKey = Utils::getConfirmedPassword();
+        if (newPasswordKey.isNull()) {
+            err << QObject::tr("Failed to set database password.") << endl;
+            return {};
+        }
+    }
+
+    QSharedPointer<FileKey> newFileKey;
+    if (!newFileKeyPath.isEmpty()) {
+        newFileKey = QSharedPointer<FileKey>::create();
+        QString errorMessage;
+        if (!newFileKey->load(newFileKeyPath, &errorMessage)) {
+            err << QObject::tr("Loading the new key file failed: %1").arg(errorMessage) << endl;
+            return {};
+        }
+    }
+
     for (const auto& key : database->key()->keys()) {
         if (key->uuid() == PasswordKey::UUID) {
             if (removePassword) {
@@ -118,6 +150,7 @@ QSharedPointer<CompositeKey> DatabaseEdit::getNewDatabaseKey(QSharedPointer<Data
                 continue;
             }
 
+            newDatabaseKey->addKey(newPasswordKey);
             continue;
         }
 
@@ -131,6 +164,7 @@ QSharedPointer<CompositeKey> DatabaseEdit::getNewDatabaseKey(QSharedPointer<Data
                 continue;
             }
 
+            newDatabaseKey->addKey(newFileKey);
             continue;
         }
 
@@ -144,22 +178,11 @@ QSharedPointer<CompositeKey> DatabaseEdit::getNewDatabaseKey(QSharedPointer<Data
         }
     }
 
-    if (updatePassword) {
-        auto passwordKey = Utils::getConfirmedPassword();
-        if (passwordKey.isNull()) {
-            err << QObject::tr("Failed to set database password.") << endl;
-            return {};
-        }
-        newDatabaseKey->addKey(passwordKey);
+    if (!newDatabaseKey->hasKey(PasswordKey::UUID) && updatePassword) {
+        newDatabaseKey->addKey(newPasswordKey);
     }
 
-    if (!newFileKeyPath.isEmpty()) {
-        auto newFileKey = QSharedPointer<FileKey>::create();
-        QString errorMessage;
-        if (!newFileKey->load(newFileKeyPath, &errorMessage)) {
-            err << QObject::tr("Loading the new key file failed: %1").arg(errorMessage) << endl;
-            return {};
-        }
+    if (!newDatabaseKey->hasKey(FileKey::UUID) && !newFileKeyPath.isEmpty()) {
         newDatabaseKey->addKey(newFileKey);
     }
 

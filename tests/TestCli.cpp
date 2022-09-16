@@ -935,6 +935,15 @@ void TestCli::testDatabaseEdit()
     db = readDatabase(dbFilename, "b");
     QVERIFY(!db.isNull());
 
+    // Trying to remove the key file when there is none set should
+    // raise an error.
+    setInput("b");
+    execCmd(editCmd, {"db-edit", dbFilename, "-p", "--unset-key-file"});
+    QCOMPARE(m_stdout->readAll(), QByteArray(""));
+    m_stderr->readLine();
+    QCOMPARE(m_stderr->readLine(), QByteArray("Cannot remove file key: The database does not have a file key.\n"));
+    QCOMPARE(m_stderr->readLine(), QByteArray("Could not change the database key.\n"));
+
     setInput("b");
     execCmd(editCmd, {"db-edit", dbFilename, "--unset-password"});
     QCOMPARE(m_stdout->readAll(), QByteArray(""));

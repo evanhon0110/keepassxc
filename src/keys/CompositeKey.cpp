@@ -170,6 +170,27 @@ void CompositeKey::addKey(const QSharedPointer<Key>& key)
 }
 
 /**
+ * Test if a \link Key with the specified ID is
+ * in the composite key.
+ *
+ * @param keyId the ID of the key to detect
+ */
+bool CompositeKey::hasKey(const QUuid keyId) const
+{
+    for (const QSharedPointer<Key>& key : m_keys) {
+        if (key->uuid() == keyId) {
+            return true;
+        }
+    }
+    for (const QSharedPointer<ChallengeResponseKey>& key : m_challengeResponseKeys) {
+        if (key->uuid() == keyId) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * @return list of Keys which are part of this CompositeKey
  */
 const QList<QSharedPointer<Key>>& CompositeKey::keys() const
