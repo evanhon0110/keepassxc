@@ -7883,6 +7883,14 @@ Kernel: %3 %4</source>
         <source>Cannot remove all the keys from a database.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Cannot remove password: The database does not have a password.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot remove file key: The database does not have a file key.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QtIOCompressor</name>
