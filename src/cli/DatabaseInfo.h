@@ -15,17 +15,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef KEEPASSXC_INFO_H
-#define KEEPASSXC_INFO_H
+#ifndef KEEPASSXC_DATABASEINFO_H
+#define KEEPASSXC_DATABASEINFO_H
 
 #include "DatabaseCommand.h"
 
-class Info : public DatabaseCommand
+class DatabaseInfo : public DatabaseCommand
 {
 public:
-    Info();
+    DatabaseInfo();
 
     int executeWithDatabase(QSharedPointer<Database> db, QSharedPointer<QCommandLineParser> parser) override;
 };
 
-#endif // KEEPASSXC_INFO_H
+#endif // KEEPASSXC_DATABASEINFO_H

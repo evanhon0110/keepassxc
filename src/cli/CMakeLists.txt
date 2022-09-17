@@ -26,6 +26,7 @@ set(cli_SOURCES
         Command.cpp
         DatabaseCommand.cpp
         DatabaseEdit.cpp
+        DatabaseInfo.cpp
         Diceware.cpp
         Edit.cpp
         Estimate.cpp
@@ -34,7 +35,6 @@ set(cli_SOURCES
         Generate.cpp
         Help.cpp
         Import.cpp
-        Info.cpp
         List.cpp
         Merge.cpp
         Move.cpp

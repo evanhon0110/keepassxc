@@ -36,6 +36,7 @@
 #include "cli/Clip.h"
 #include "cli/Create.h"
 #include "cli/DatabaseEdit.h"
+#include "cli/DatabaseInfo.h"
 #include "cli/Diceware.h"
 #include "cli/Edit.h"
 #include "cli/Estimate.h"
@@ -43,7 +44,6 @@
 #include "cli/Generate.h"
 #include "cli/Help.h"
 #include "cli/Import.h"
-#include "cli/Info.h"
 #include "cli/List.h"
 #include "cli/Merge.h"
 #include "cli/Move.h"
@@ -954,7 +954,7 @@ void TestCli::testDatabaseEdit()
 
 void TestCli::testInfo()
 {
-    Info infoCmd;
+    DatabaseInfo infoCmd;
     QVERIFY(!infoCmd.name.isEmpty());
     QVERIFY(infoCmd.getDescriptionLine().contains(infoCmd.name));
 

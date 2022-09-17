@@ -25,6 +25,7 @@
 #include "Close.h"
 #include "Create.h"
 #include "DatabaseEdit.h"
+#include "DatabaseInfo.h"
 #include "Diceware.h"
 #include "Edit.h"
 #include "Estimate.h"
@@ -33,7 +34,6 @@
 #include "Generate.h"
 #include "Help.h"
 #include "Import.h"
-#include "Info.h"
 #include "List.h"
 #include "Merge.h"
 #include "Move.h"
@@ -175,7 +175,7 @@ namespace Commands
         s_commands.insert(QStringLiteral("close"), QSharedPointer<Command>(new Close()));
         s_commands.insert(QStringLiteral("db-create"), QSharedPointer<Command>(new Create()));
         s_commands.insert(QStringLiteral("db-edit"), QSharedPointer<Command>(new DatabaseEdit()));
-        s_commands.insert(QStringLiteral("db-info"), QSharedPointer<Command>(new Info()));
+        s_commands.insert(QStringLiteral("db-info"), QSharedPointer<Command>(new DatabaseInfo()));
         s_commands.insert(QStringLiteral("diceware"), QSharedPointer<Command>(new Diceware()));
         s_commands.insert(QStringLiteral("edit"), QSharedPointer<Command>(new Edit()));
         s_commands.insert(QStringLiteral("estimate"), QSharedPointer<Command>(new Estimate()));
