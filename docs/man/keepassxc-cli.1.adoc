@@ -247,6 +247,7 @@ The same password generation options as documented for the generate command can 
 *-p*, *--set-password*::
   Set a password for the database.
 
+=== Db-create, Import options
 *-t*, *--decryption-time* <__time__>::
   Target decryption time in MS for the database.
 
