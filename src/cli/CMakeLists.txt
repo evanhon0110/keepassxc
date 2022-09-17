@@ -22,9 +22,9 @@ set(cli_SOURCES
         AttachmentRemove.cpp
         Clip.cpp
         Close.cpp
-        Create.cpp
         Command.cpp
         DatabaseCommand.cpp
+        DatabaseCreate.cpp
         DatabaseEdit.cpp
         DatabaseInfo.cpp
         Diceware.cpp

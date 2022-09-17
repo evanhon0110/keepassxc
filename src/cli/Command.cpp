@@ -23,7 +23,7 @@
 #include "AttachmentRemove.h"
 #include "Clip.h"
 #include "Close.h"
-#include "Create.h"
+#include "DatabaseCreate.h"
 #include "DatabaseEdit.h"
 #include "DatabaseInfo.h"
 #include "Diceware.h"
@@ -173,7 +173,7 @@ namespace Commands
         s_commands.insert(QStringLiteral("attachment-rm"), QSharedPointer<Command>(new AttachmentRemove()));
         s_commands.insert(QStringLiteral("clip"), QSharedPointer<Command>(new Clip()));
         s_commands.insert(QStringLiteral("close"), QSharedPointer<Command>(new Close()));
-        s_commands.insert(QStringLiteral("db-create"), QSharedPointer<Command>(new Create()));
+        s_commands.insert(QStringLiteral("db-create"), QSharedPointer<Command>(new DatabaseCreate()));
         s_commands.insert(QStringLiteral("db-edit"), QSharedPointer<Command>(new DatabaseEdit()));
         s_commands.insert(QStringLiteral("db-info"), QSharedPointer<Command>(new DatabaseInfo()));
         s_commands.insert(QStringLiteral("diceware"), QSharedPointer<Command>(new Diceware()));

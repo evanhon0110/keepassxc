@@ -34,7 +34,7 @@
 #include "cli/AttachmentImport.h"
 #include "cli/AttachmentRemove.h"
 #include "cli/Clip.h"
-#include "cli/Create.h"
+#include "cli/DatabaseCreate.h"
 #include "cli/DatabaseEdit.h"
 #include "cli/DatabaseInfo.h"
 #include "cli/Diceware.h"
@@ -733,7 +733,7 @@ void TestCli::testClip()
 
 void TestCli::testCreate()
 {
-    Create createCmd;
+    DatabaseCreate createCmd;
     QVERIFY(!createCmd.name.isEmpty());
     QVERIFY(createCmd.getDescriptionLine().contains(createCmd.name));
 
@@ -863,7 +863,7 @@ void TestCli::testDatabaseEdit()
 
     QScopedPointer<QTemporaryDir> testDir(new QTemporaryDir());
 
-    Create createCmd;
+    DatabaseCreate createCmd;
     DatabaseEdit editCmd;
     QVERIFY(!createCmd.name.isEmpty());
     QVERIFY(createCmd.getDescriptionLine().contains(createCmd.name));
@@ -1717,7 +1717,7 @@ void TestCli::testMerge()
 
 void TestCli::testMergeWithKeys()
 {
-    Create createCmd;
+    DatabaseCreate createCmd;
     QVERIFY(!createCmd.name.isEmpty());
     QVERIFY(createCmd.getDescriptionLine().contains(createCmd.name));
 

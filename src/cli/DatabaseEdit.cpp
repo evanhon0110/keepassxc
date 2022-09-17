@@ -18,7 +18,7 @@
 #include "DatabaseEdit.h"
 
 #include "Utils.h"
-#include "cli/Create.h"
+#include "cli/DatabaseCreate.h"
 #include "keys/ChallengeResponseKey.h"
 #include "keys/FileKey.h"
 #include "keys/PasswordKey.h"
@@ -35,8 +35,8 @@ DatabaseEdit::DatabaseEdit()
 {
     name = QString("db-edit");
     description = QObject::tr("Edit a database.");
-    options.append(Create::SetKeyFileOption);
-    options.append(Create::SetPasswordOption);
+    options.append(DatabaseCreate::SetKeyFileOption);
+    options.append(DatabaseCreate::SetPasswordOption);
     options.append(DatabaseEdit::UnsetKeyFileOption);
     options.append(DatabaseEdit::UnsetPasswordOption);
 }
@@ -49,31 +49,31 @@ int DatabaseEdit::executeWithDatabase(QSharedPointer<Database> database, QShared
     const QStringList args = parser->positionalArguments();
     bool databaseWasChanged = false;
 
-    if (parser->isSet(Create::SetPasswordOption) && parser->isSet(DatabaseEdit::UnsetPasswordOption)) {
+    if (parser->isSet(DatabaseCreate::SetPasswordOption) && parser->isSet(DatabaseEdit::UnsetPasswordOption)) {
         err << QObject::tr("Cannot use %1 and %2 at the same time.")
-                   .arg(Create::SetPasswordOption.names().at(0))
+                   .arg(DatabaseCreate::SetPasswordOption.names().at(0))
                    .arg(DatabaseEdit::UnsetPasswordOption.names().at(0))
             << endl;
         return EXIT_FAILURE;
     }
 
-    if (parser->isSet(Create::SetKeyFileOption) && parser->isSet(DatabaseEdit::UnsetKeyFileOption)) {
+    if (parser->isSet(DatabaseCreate::SetKeyFileOption) && parser->isSet(DatabaseEdit::UnsetKeyFileOption)) {
         err << QObject::tr("Cannot use %1 and %2 at the same time.")
-                   .arg(Create::SetKeyFileOption.names().at(0))
+                   .arg(DatabaseCreate::SetKeyFileOption.names().at(0))
                    .arg(DatabaseEdit::UnsetKeyFileOption.names().at(0))
             << endl;
         return EXIT_FAILURE;
     }
 
     bool hasKeyChange =
-        (parser->isSet(Create::SetPasswordOption) || parser->isSet(Create::SetKeyFileOption)
+        (parser->isSet(DatabaseCreate::SetPasswordOption) || parser->isSet(DatabaseCreate::SetKeyFileOption)
          || parser->isSet(DatabaseEdit::UnsetPasswordOption) || parser->isSet(DatabaseEdit::UnsetKeyFileOption));
 
     if (hasKeyChange) {
         auto newDatabaseKey = getNewDatabaseKey(database,
-                                                parser->isSet(Create::SetPasswordOption),
+                                                parser->isSet(DatabaseCreate::SetPasswordOption),
                                                 parser->isSet(DatabaseEdit::UnsetPasswordOption),
-                                                parser->value(Create::SetKeyFileOption),
+                                                parser->value(DatabaseCreate::SetKeyFileOption),
                                                 parser->isSet(DatabaseEdit::UnsetKeyFileOption));
         if (newDatabaseKey.isNull()) {
             err << QObject::tr("Could not change the database key.") << endl;

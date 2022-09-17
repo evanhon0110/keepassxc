@@ -15,15 +15,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef KEEPASSXC_CREATE_H
-#define KEEPASSXC_CREATE_H
+#ifndef KEEPASSXC_DATABASECREATE_H
+#define KEEPASSXC_DATABASECREATE_H
 
 #include "Command.h"
 
-class Create : public Command
+class DatabaseCreate : public Command
 {
 public:
-    Create();
+    DatabaseCreate();
     int execute(const QStringList& arguments) override;
 
     static QSharedPointer<Database> initializeDatabaseFromOptions(const QSharedPointer<QCommandLineParser>& parser);
@@ -34,4 +34,4 @@ public:
     static const QCommandLineOption DecryptionTimeOption;
 };
 
-#endif // KEEPASSXC_CREATE_H
+#endif // KEEPASSXC_DATABASECREATE_H
