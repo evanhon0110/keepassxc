@@ -44,6 +44,7 @@ public:
 
     void addKey(const QSharedPointer<Key>& key);
     bool hasKey(const QUuid keyType) const;
+    QSharedPointer<Key> getKey(const QUuid keyType) const;
     const QList<QSharedPointer<Key>>& keys() const;
 
     void addChallengeResponseKey(const QSharedPointer<ChallengeResponseKey>& key);

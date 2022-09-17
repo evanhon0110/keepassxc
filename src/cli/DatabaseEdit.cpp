@@ -106,84 +106,63 @@ QSharedPointer<CompositeKey> DatabaseEdit::getNewDatabaseKey(QSharedPointer<Data
 {
     auto& err = Utils::STDERR;
     auto newDatabaseKey = QSharedPointer<CompositeKey>::create();
+    bool updateKeyFile = !newFileKeyPath.isEmpty();
 
-    if (removePassword) {
-        if (!database->key()->hasKey(PasswordKey::UUID)) {
-            err << QObject::tr("Cannot remove password: The database does not have a password.") << endl;
-            return {};
-        }
-    }
-    if (removeKeyFile) {
-        if (!database->key()->hasKey(FileKey::UUID)) {
-            err << QObject::tr("Cannot remove file key: The database does not have a file key.") << endl;
-            return {};
-        }
+    auto currentPasswordKey = database->key()->getKey(PasswordKey::UUID);
+    auto currentFileKey = database->key()->getKey(FileKey::UUID);
+    auto currentChallengeResponseKey = database->key()->getKey(ChallengeResponseKey::UUID);
+
+    if (removePassword && currentPasswordKey.isNull()) {
+        err << QObject::tr("Cannot remove password: The database does not have a password.") << endl;
+        return {};
     }
 
-    QSharedPointer<PasswordKey> newPasswordKey;
+    if (removeKeyFile && currentFileKey.isNull()) {
+        err << QObject::tr("Cannot remove file key: The database does not have a file key.") << endl;
+        return {};
+    }
+
     if (updatePassword) {
-        newPasswordKey = Utils::getConfirmedPassword();
+        QSharedPointer<PasswordKey> newPasswordKey = Utils::getConfirmedPassword();
         if (newPasswordKey.isNull()) {
             err << QObject::tr("Failed to set database password.") << endl;
             return {};
         }
+        newDatabaseKey->addKey(newPasswordKey);
+    } else if (!removePassword && !currentPasswordKey.isNull()) {
+        newDatabaseKey->addKey(currentPasswordKey);
     }
 
-    QSharedPointer<FileKey> newFileKey;
-    if (!newFileKeyPath.isEmpty()) {
-        newFileKey = QSharedPointer<FileKey>::create();
+    if (updateKeyFile) {
+        QSharedPointer<FileKey> newFileKey = QSharedPointer<FileKey>::create();
         QString errorMessage;
         if (!Utils::loadFileKey(newFileKeyPath, newFileKey)) {
             err << QObject::tr("Loading the new key file failed: %1").arg(errorMessage) << endl;
             return {};
         }
-    }
-
-    for (const auto& key : database->key()->keys()) {
-        if (key->uuid() == PasswordKey::UUID) {
-            if (removePassword) {
-                continue;
-            }
-
-            if (!updatePassword) {
-                newDatabaseKey->addKey(key);
-                continue;
-            }
-
-            newDatabaseKey->addKey(newPasswordKey);
-            continue;
-        }
-
-        if (key->uuid() == FileKey::UUID) {
-            if (removeKeyFile) {
-                continue;
-            }
-
-            if (newFileKeyPath.isEmpty()) {
-                newDatabaseKey->addKey(key);
-                continue;
-            }
-
-            newDatabaseKey->addKey(newFileKey);
-            continue;
-        }
-
-        // Not sure that we should ever get here.
-        newDatabaseKey->addKey(key);
-    }
-
-    for (const auto& key : database->key()->challengeResponseKeys()) {
-        if (key->uuid() == ChallengeResponseKey::UUID) {
-            newDatabaseKey->addKey(key);
-        }
-    }
-
-    if (!newDatabaseKey->hasKey(PasswordKey::UUID) && updatePassword) {
-        newDatabaseKey->addKey(newPasswordKey);
-    }
-
-    if (!newDatabaseKey->hasKey(FileKey::UUID) && !newFileKeyPath.isEmpty()) {
         newDatabaseKey->addKey(newFileKey);
+    } else if (!removeKeyFile && !currentFileKey.isNull()) {
+        newDatabaseKey->addKey(currentFileKey);
+    }
+
+    // This is a sanity check to make sure that this function is not used if
+    // new key types are introduced. Otherwise, those key types would be
+    // silently removed from the database.
+    for (const QSharedPointer<Key>& key : database->key()->keys()) {
+        if (key->uuid() != PasswordKey::UUID && key->uuid() != FileKey::UUID) {
+            err << QObject::tr("Found unexpected Key type %1").arg(key->uuid().toString()) << endl;
+            return {};
+        }
+    }
+    for (const QSharedPointer<ChallengeResponseKey>& key : database->key()->challengeResponseKeys()) {
+        if (key->uuid() != ChallengeResponseKey::UUID) {
+            err << QObject::tr("Found unexpected Key type %1").arg(key->uuid().toString()) << endl;
+            return {};
+        }
+    }
+
+    if (!currentChallengeResponseKey.isNull()) {
+        newDatabaseKey->addKey(currentChallengeResponseKey);
     }
 
     if (newDatabaseKey->keys().isEmpty()) {

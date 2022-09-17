@@ -7891,6 +7891,10 @@ Kernel: %3 %4</source>
         <source>Cannot remove file key: The database does not have a file key.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Found unexpected Key type %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QtIOCompressor</name>

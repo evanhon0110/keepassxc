@@ -851,25 +851,24 @@ void TestCli::testCreate()
 
 void TestCli::testDatabaseEdit()
 {
-    TemporaryFile keyFile;
-    keyFile.open();
-    keyFile.write(QString("keyFilePassword").toLatin1());
-    keyFile.close();
+    TemporaryFile firstKeyFile;
+    firstKeyFile.open();
+    firstKeyFile.write(QString("keyFilePassword").toLatin1());
+    firstKeyFile.close();
 
-    TemporaryFile newKeyFile;
-    newKeyFile.open();
-    newKeyFile.write(QString("newKeyFilePassword").toLatin1());
-    newKeyFile.close();
+    TemporaryFile secondKeyFile;
+    secondKeyFile.open();
+    secondKeyFile.write(QString("newKeyFilePassword").toLatin1());
+    secondKeyFile.close();
 
     QScopedPointer<QTemporaryDir> testDir(new QTemporaryDir());
 
     DatabaseCreate createCmd;
     DatabaseEdit editCmd;
-    QVERIFY(!createCmd.name.isEmpty());
-    QVERIFY(createCmd.getDescriptionLine().contains(createCmd.name));
+    QVERIFY(!editCmd.name.isEmpty());
+    QVERIFY(editCmd.getDescriptionLine().contains(editCmd.name));
 
     QString dbFilename;
-
     dbFilename = testDir->path() + "/testDatabaseEdit.kdbx";
 
     // Creating a database for testing
@@ -894,6 +893,10 @@ void TestCli::testDatabaseEdit()
     m_stderr->readLine();
     QCOMPARE(m_stderr->readAll(), QByteArray("Cannot use set-key-file and unset-key-file at the same time.\n"));
 
+    // Sanity check.
+    db = readDatabase(dbFilename, "a");
+    QVERIFY(!db.isNull());
+
     setInput({"a", "b", "b"});
     execCmd(editCmd, {"db-edit", dbFilename, "-p"});
     QCOMPARE(m_stdout->readAll(), QByteArray("Successfully edited the database.\n"));
@@ -903,7 +906,7 @@ void TestCli::testDatabaseEdit()
     QVERIFY(!db.isNull());
 
     setInput("b");
-    execCmd(editCmd, {"db-edit", dbFilename, "--set-key-file", keyFile.fileName()});
+    execCmd(editCmd, {"db-edit", dbFilename, "--set-key-file", firstKeyFile.fileName()});
     // Skipping the password prompt.
     m_stderr->readLine();
     QCOMPARE(m_stderr->readAll(), QByteArray(""));
@@ -912,25 +915,57 @@ void TestCli::testDatabaseEdit()
     // Sanity check
     db = readDatabase(dbFilename, "b");
     QVERIFY(db.isNull());
-    db = readDatabase(dbFilename, "b", keyFile.fileName());
+    db = readDatabase(dbFilename, "b", firstKeyFile.fileName());
     QVERIFY(!db.isNull());
 
     setInput("b");
-    execCmd(editCmd, {"db-edit", dbFilename, "-k", keyFile.fileName(), "--set-key-file", newKeyFile.fileName()});
+    execCmd(editCmd,
+            {"db-edit", dbFilename, "-k", firstKeyFile.fileName(), "--set-key-file", secondKeyFile.fileName()});
     QCOMPARE(m_stdout->readAll(), QByteArray("Successfully edited the database.\n"));
 
     // Sanity check
-    db = readDatabase(dbFilename, "b", keyFile.fileName());
+    db = readDatabase(dbFilename, "b", firstKeyFile.fileName());
     QVERIFY(db.isNull());
-    db = readDatabase(dbFilename, "b", newKeyFile.fileName());
+    db = readDatabase(dbFilename, "b", secondKeyFile.fileName());
     QVERIFY(!db.isNull());
 
     setInput("b");
-    execCmd(editCmd, {"db-edit", dbFilename, "-k", newKeyFile.fileName(), "--unset-key-file"});
+    execCmd(editCmd, {"db-edit", dbFilename, "-k", secondKeyFile.fileName(), "--unset-password"});
+    // Skipping the password prompt.
+    m_stderr->readLine();
+    QCOMPARE(m_stderr->readAll(), QByteArray(""));
+    QCOMPARE(m_stdout->readAll(), QByteArray("Successfully edited the database.\n"));
+
+    execCmd(editCmd,
+            {"db-edit",
+             dbFilename,
+             "--no-password",
+             "-k",
+             secondKeyFile.fileName(),
+             "--set-key-file",
+             firstKeyFile.fileName()});
+    // Skipping the password prompt.
+    m_stderr->readLine();
+    QCOMPARE(m_stderr->readAll(), QByteArray(""));
+    QCOMPARE(m_stdout->readAll(), QByteArray("Successfully edited the database.\n"));
+
+    setInput({"b", "b"});
+    execCmd(editCmd, {"db-edit", dbFilename, "-k", firstKeyFile.fileName(), "--no-password", "--set-password"});
+    // Skipping over the password setting prompts.
+    m_stderr->readLine();
+    m_stderr->readLine();
+    QCOMPARE(m_stderr->readAll(), QByteArray(""));
+    QCOMPARE(m_stdout->readAll(), QByteArray("Successfully edited the database.\n"));
+
+    setInput("b");
+    execCmd(editCmd, {"db-edit", dbFilename, "-k", firstKeyFile.fileName(), "--unset-key-file"});
+    // Skipping the password prompt.
+    m_stderr->readLine();
+    QCOMPARE(m_stderr->readAll(), QByteArray(""));
     QCOMPARE(m_stdout->readAll(), QByteArray("Successfully edited the database.\n"));
 
     // Sanity check
-    db = readDatabase(dbFilename, "b", keyFile.fileName());
+    db = readDatabase(dbFilename, "b", firstKeyFile.fileName());
     QVERIFY(db.isNull());
     db = readDatabase(dbFilename, "b");
     QVERIFY(!db.isNull());
