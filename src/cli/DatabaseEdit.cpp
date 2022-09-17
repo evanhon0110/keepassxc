@@ -133,7 +133,7 @@ QSharedPointer<CompositeKey> DatabaseEdit::getNewDatabaseKey(QSharedPointer<Data
     if (!newFileKeyPath.isEmpty()) {
         newFileKey = QSharedPointer<FileKey>::create();
         QString errorMessage;
-        if (!newFileKey->load(newFileKeyPath, &errorMessage)) {
+        if (!Utils::loadFileKey(newFileKeyPath, newFileKey)) {
             err << QObject::tr("Loading the new key file failed: %1").arg(errorMessage) << endl;
             return {};
         }
