@@ -333,36 +333,29 @@ set(gui_SOURCES
     ${gui_SOURCES}
     ${keepassx_SOURCES})
 
-add_library(keepassx_gui STATIC ${gui_SOURCES})
-target_link_libraries(keepassx_gui
-        autotype
-        ${keepassxcbrowser_LIB}
+set(keepassx_core_LIBRARIES
         ${qrcode_LIB}
-        ${fdosecrets_LIB}
         Qt5::Core
         Qt5::Concurrent
-        Qt5::Network
-        Qt5::Widgets
         ${BOTAN2_LIBRARIES}
         ${PCSC_LIBRARIES}
         ${ZXCVBN_LIBRARIES}
         ${ZLIB_LIBRARIES}
         ${ARGON2_LIBRARIES}
-        ${thirdparty_LIBRARIES}
+        ${thirdparty_LIBRARIES})
+
+add_library(keepassx_gui STATIC ${gui_SOURCES})
+target_link_libraries(keepassx_gui
+        ${keepassx_core_LIBRARIES}
+        Qt5::Network
+        Qt5::Widgets
+        autotype
+        ${keepassxcbrowser_LIB}
+        ${fdosecrets_LIB}
   )
 
 set_target_properties(keepassx_core PROPERTIES COMPILE_DEFINITIONS KEEPASSX_BUILDING_CORE)
-target_link_libraries(keepassx_core
-        ${qrcode_LIB}
-        Qt5::Core
-        Qt5::Concurrent
-        ${BOTAN2_LIBRARIES}
-        ${PCSC_LIBRARIES}
-        ${ZXCVBN_LIBRARIES}
-        ${ZLIB_LIBRARIES}
-        ${ARGON2_LIBRARIES}
-        ${thirdparty_LIBRARIES}
-  )
+target_link_libraries(keepassx_core ${keepassx_core_LIBRARIES})
 
 if(WITH_XC_SSHAGENT)
   target_link_libraries(keepassx_gui sshagent)
