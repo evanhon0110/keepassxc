@@ -279,7 +279,6 @@ endif()
 add_subdirectory(thirdparty)
 
 set(autotype_SOURCES
-        core/Tools.cpp
         autotype/AutoType.cpp
         autotype/AutoTypeAction.cpp
         autotype/AutoTypeMatchModel.cpp
